@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  guru
+  murid
+}
+
+enum StatusContent {
+  draft
+  locked
+  published
+}
+
+enum QuestionType {
+  multiple
+  voice
+}
+
+model User {
+    id    Int     @id @default(autoincrement())
+    username  String  @unique
+    fullname  String
+    password String
+    role Role @default(murid)
+    
+    createdAt     DateTime  @default(now()) @map("created_at")
+    updatedAt     DateTime  @updatedAt @map("updated_at")
+
+    progresses Progress[]
+    answers    QuisAnswer[]
+    @@map("users")
+}
+
+model Content {
+  id        Int      @id @default(autoincrement())
+  title     String
+  desc      String
+  index     Int
+  status    StatusContent @default(draft)
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  subContents   SubContent[]
+  progresses    Progress[]
+  quises        Quis[]
+  @@map("contents")
+}
+
+model SubContent {
+  id          Int      @id @default(autoincrement())
+  contentId   Int
+  title       String
+  materi      String
+  index       Int
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  content   Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  @@map("sub_contents")
+}
+
+model Progress {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  contentId   Int
+  isCompleted Boolean  @default(false) 
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content    Content    @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@map("progresses")
+}
+
+model Quis {
+  id          Int      @id @default(autoincrement())
+  contentId   Int
+  title       String
+  desc        String
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  content   Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  questions QuisQuestion[]
+  @@map("quises")
+}
+
+model QuisQuestion {
+  id          Int      @id @default(autoincrement())
+  quisId      Int
+  type        QuestionType
+  question    String
+  optionA     String
+  optionB     String
+  optionC     String
+  optionD     String
+  answer      String
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  quis       Quis     @relation(fields: [quisId], references: [id], onDelete: Cascade)
+  answers    QuisAnswer[]
+  @@map("quis_questions")
+}
+
+model QuisAnswer {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  questionId  Int
+  textAnswer String?
+  selectedOption String?
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question   QuisQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  @@map("quis_answers")
+}
