@@ -1,7 +1,8 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
-import bcrypt from "bcrypt" // untuk verifikasi password hash
+// import bcrypt from "bcrypt" // untuk verifikasi password hash
+import { verifyPassword } from "@/lib/hash"
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -21,13 +22,8 @@ export const authOptions: NextAuthOptions = {
 
         if (!user) return null
 
-        // Cek password dengan bcrypt
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        )
-
-        if (!isPasswordValid) return null
+        const isValid = await verifyPassword(credentials.password, user.password)
+        if (!isValid) throw new Error("Invalid password")
 
         // Return data user ke session
         return {

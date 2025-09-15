@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import LogoutButton from "@/components/auth/LogoutButton"
 import LoadingSpinner from "@/components/ui/LoadingSpinner"
-import { stopProgress } from "@/lib/progress"
+import { useProgress } from "@/components/providers/ProgressBarProvider" // pastikan path sesuai
 
 type User = {
   id: number
@@ -15,18 +15,21 @@ type User = {
 export default function DashboardClient({ session }: { session: any }) {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
+  const { startTask, endTask } = useProgress()
 
   useEffect(() => {
     const fetchUsers = async () => {
+      startTask() // mulai progress
       try {
         const res = await fetch("/api/users")
         const data = await res.json()
+        await new Promise((resolve) => setTimeout(resolve, 3000)) // simulasi lambat
         setUsers(data)
       } catch (err) {
         console.error("Failed to fetch users", err)
       } finally {
         setLoading(false)
-        stopProgress() // ⬅️ hentikan progress setelah fetch selesai
+        endTask() // selesai progress
       }
     }
     fetchUsers()
