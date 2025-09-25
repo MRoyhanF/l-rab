@@ -15,8 +15,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
 
-
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -33,7 +31,15 @@ export default function LoginPage() {
       toast.error("Username atau password salah")
     } else {
       toast.success("Login berhasil!")
-      window.location.href = "/dashboard"
+
+      // Fetch session setelah login untuk dapat role
+      const session = await fetch("/api/auth/session").then((res) => res.json())
+
+      if (session?.user?.role) {
+        window.location.href = `/${session.user.role}/dashboard`
+      } else {
+        window.location.href = "/login"
+      }
     }
   }
 
