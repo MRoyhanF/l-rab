@@ -63,6 +63,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
+    const existingUser = await prisma.user.findUnique({
+      where: { username },
+    })
+    if (existingUser) {
+      return NextResponse.json({ error: "Username sudah terdaftar" }, { status: 409 })
+    }
+
     const hashedPassword = await hashPassword(password)
 
     const newUser = await prisma.user.create({

@@ -24,7 +24,7 @@ export default function DashboardClient({ session }: { session: any }) {
         const res = await fetch("/api/users")
         const data = await res.json()
         await new Promise((resolve) => setTimeout(resolve, 3000)) // simulasi lambat
-        setUsers(data)
+        setUsers(data.data)
       } catch (err) {
         console.error("Failed to fetch users", err)
       } finally {
@@ -41,6 +41,7 @@ export default function DashboardClient({ session }: { session: any }) {
         <div>
           <h1 className="text-2xl font-bold">Welcome, {session.user.username}</h1>
           <p className="text-gray-500">Role: {session.user.role}</p>
+          <p className="text-gray-500">Email: {session.user.id}</p>
         </div>
         <LogoutButton />
       </div>

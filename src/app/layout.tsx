@@ -1,6 +1,7 @@
+import "@/style/globals.css"
+
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
-import "@/style/globals.css"
 import { Toaster } from "sonner"
 import ProgressBarProvider from "@/components/providers/ProgressBarProvider"
 
@@ -17,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "L-RAB",
   description: "LMS Mufrodat Arabiyyah",
+  icons: {
+    icon: [{ rel: "icon", url: "/images/logo.png" }],
+  },
 }
 
 export default function RootLayout({
@@ -24,11 +28,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return (
+  return (  
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Toaster richColors position="top-right" />
-        <ProgressBarProvider>{children}</ProgressBarProvider>
+        <ProgressBarProvider>
+          {children}
+        </ProgressBarProvider>
       </body>
     </html>
   )
