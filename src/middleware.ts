@@ -6,6 +6,11 @@ const publicRoutes = ["/login", "/register", "/forgot-password"]
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
+
+  if (pathname.startsWith("/api/auth")) {
+    return NextResponse.next()
+  }
+
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
 
   if (publicRoutes.some((route) => pathname.startsWith(route))) {
