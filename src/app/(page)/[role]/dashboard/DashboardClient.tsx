@@ -1,9 +1,8 @@
 "use client"
-
 import { useEffect, useState } from "react"
 import LogoutButton from "@/components/auth/LogoutButton"
 import LoadingSpinner from "@/components/ui/LoadingSpinner"
-import { useProgress } from "@/components/providers/ProgressBarProvider" // pastikan path sesuai
+import { useTopLoader } from "nextjs-toploader";
 
 type User = {
   id: number
@@ -13,23 +12,26 @@ type User = {
 }
 
 export default function DashboardClient({ session }: { session: any }) {
+  const loader = useTopLoader();
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
-  const { startTask, endTask } = useProgress()
 
   useEffect(() => {
     const fetchUsers = async () => {
-      startTask() // mulai progress
       try {
+        loader.start(); 
+        // mulai top loader saat fetch data besar
         const res = await fetch("/api/users")
         const data = await res.json()
+
         await new Promise((resolve) => setTimeout(resolve, 3000)) // simulasi lambat
         setUsers(data.data)
       } catch (err) {
         console.error("Failed to fetch users", err)
       } finally {
+        // stop top loader setelah selesai
+        loader.done();
         setLoading(false)
-        endTask() // selesai progress
       }
     }
     fetchUsers()

@@ -1,9 +1,9 @@
-import "@/style/globals.css"
+import '@/style/globals.css'
 
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Toaster } from "sonner"
-import ProgressBarProvider from "@/components/providers/ProgressBarProvider"
+import NextTopLoader from "nextjs-toploader"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,13 +28,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return (  
+  return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <NextTopLoader color="#29D" showSpinner={false} />
         <Toaster richColors position="top-right" />
-        <ProgressBarProvider>
-          {children}
-        </ProgressBarProvider>
+        {/* <NextTopLoader
+          color="#0164ef"
+          initialPosition={0.08}
+          crawlSpeed={500}
+          height={2}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={500}
+          shadow="0 0 10px #3488fe,0 0 5px #3488fe"
+        /> */}
+        {children}
       </body>
     </html>
   )
